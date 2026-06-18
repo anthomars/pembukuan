@@ -189,7 +189,6 @@
     @endif
 
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const initProductsTable = () => {
             const table = document.querySelector('#products-table');

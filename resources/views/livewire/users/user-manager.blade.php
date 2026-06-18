@@ -170,7 +170,6 @@
         </div>
     @endif
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const getUserManagerComponent = () => {
             const root = document.querySelector('[wire\\:id]');

@@ -298,7 +298,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const initSaleEntryTable = () => {
             const table = document.querySelector('#sale-entry-table');

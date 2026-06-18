@@ -54,8 +54,7 @@
 </head>
 <body>
     <div class="card">
-        <h1 class="title">Masuk</h1>
-        <div class="muted">Gunakan akun admin untuk membuka dashboard pembukuan.</div>
+        <h1 class="title" style="text-align: center;">Sign In</h1>
 
         <form method="POST" action="/login">
             @csrf
@@ -66,7 +65,7 @@
             <label for="password">Password</label>
             <input id="password" type="password" name="password" required>
 
-            <button type="submit">Masuk</button>
+            <button type="submit">Login</button>
         </form>
     </div>
 </body>
