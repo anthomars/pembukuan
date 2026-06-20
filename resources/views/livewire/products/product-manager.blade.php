@@ -64,7 +64,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" />
     <div class="toolbar">
         <div>
-            <h1 style="margin:0 0 6px;">Master Produk</h1>
+            <h1 style="margin:0 0 6px;">Master Produ k</h1>
             <div class="muted">Kelola barcode, HPP, harga jual, dan stok opsional.</div>
         </div>
         <div class="actions">
