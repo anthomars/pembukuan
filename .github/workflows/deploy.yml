@@ -1,0 +1,40 @@
+name: Auto Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+    - name: Pull latest code
+      run: |
+        cd /opt/rpmcukstore
+        git pull origin main
+
+    - name: Install composer dependencies
+      run: |
+        cd /opt/rpmcukstore
+        composer install --no-dev --no-scripts --optimize-autoloader
+
+    - name: Package discover
+      run: |
+      cd /opt/rpmcukstore
+      php artisan package:discover --ansi
+
+    - name: Build assets
+      run: |
+        cd /opt/rpmcukstore
+        npm install && npm run build
+
+    - name: Run migrations
+      run: |
+        cd /opt/rpmcukstore
+        php artisan migrate --force
+
+    - name: Optimize
+      run: |
+        cd /opt/rpmcukstore
+        php artisan optimize
