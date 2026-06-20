@@ -21,8 +21,8 @@ jobs:
 
     - name: Package discover
       run: |
-      cd /opt/rpmcukstore
-      php artisan package:discover --ansi
+        cd /opt/rpmcukstore
+        php artisan package:discover --ansi
 
     - name: Build assets
       run: |
