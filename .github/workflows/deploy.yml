@@ -4,44 +4,44 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: self-hosted
+
     steps:
-    - name: Fix repository permissions
-      run: |
-        sudo chown -R "$(id -un)":"$(id -gn)" /opt/rpmcukstore
-        git config --global --add safe.directory /opt/rpmcukstore
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Pull latest code
-      run: |
-        cd /opt/rpmcukstore
-        git fetch origin main
-        git reset --hard origin/main
-        git clean -fd
+      - name: Install composer dependencies
+        run: composer install --no-interaction --no-dev --prefer-dist --optimize-autoloader
 
-    - name: Install composer dependencies
-      run: |
-        cd /opt/rpmcukstore
-        composer install --no-dev --no-scripts --optimize-autoloader
+      - name: Install node dependencies
+        run: npm ci
 
-    - name: Package discover
-      run: |
-        cd /opt/rpmcukstore
-        php artisan package:discover --ansi
+      - name: Build assets
+        run: npm run build
 
-    - name: Build assets
-      run: |
-        cd /opt/rpmcukstore
-        npm ci && npm run build
+      - name: Sync files to app directory
+        run: |
+          rsync -az --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.env' \
+            --exclude='node_modules/' \
+            --exclude='storage/' \
+            --exclude='public/storage' \
+            ./ /opt/rpmcukstore/
 
-    - name: Run migrations
-      run: |
-        cd /opt/rpmcukstore
-        php artisan migrate --force
+      - name: Run migrations
+        working-directory: /opt/rpmcukstore
+        run: php artisan migrate --force
 
-    - name: Optimize
-      run: |
-        cd /opt/rpmcukstore
-        php artisan optimize
+      - name: Optimize application
+        working-directory: /opt/rpmcukstore
+        run: |
+          php artisan optimize:clear
+          php artisan storage:link || true
+          php artisan optimize
+          php artisan queue:restart || true
