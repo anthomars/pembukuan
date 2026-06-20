@@ -9,6 +9,11 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
+    - name: Fix repository permissions
+      run: |
+        sudo chown -R "$(id -un)":"$(id -gn)" /opt/rpmcukstore
+        git config --global --add safe.directory /opt/rpmcukstore
+
     - name: Pull latest code
       run: |
         cd /opt/rpmcukstore
