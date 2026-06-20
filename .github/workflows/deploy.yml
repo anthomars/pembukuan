@@ -38,6 +38,10 @@ jobs:
         working-directory: /opt/rpmcukstore
         run: php artisan package:discover --ansi
 
+      - name: Run migrations
+        working-directory: /opt/rpmcukstore
+        run: php artisan migrate --force
+
       - name: Optimize application
         working-directory: /opt/rpmcukstore
         run: |
