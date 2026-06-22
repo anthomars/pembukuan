@@ -266,7 +266,9 @@
             <div class="nav">
                 <a href="/" class="{{ request()->path() === '/' ? 'active' : '' }}">Dashboard</a>
                 <a href="/penjualan" class="{{ request()->is('penjualan*') ? 'active' : '' }}">Penjualan</a>
-                <a href="/transaksi" class="{{ request()->is('transaksi*') ? 'active' : '' }}">Transaksi</a>
+                @if (auth()->user()?->role === 'owner' || auth()->user()?->role === 'admin')
+                    <a href="/transaksi" class="{{ request()->is('transaksi*') ? 'active' : '' }}">Transaksi</a>
+                @endif
                 <a href="/produk" class="{{ request()->is('produk*') ? 'active' : '' }}">Produk</a>
                 @if (auth()->user()?->role === 'owner' || auth()->user()?->role === 'admin')
                     <a href="/users" class="{{ request()->is('users*') ? 'active' : '' }}">Users</a>

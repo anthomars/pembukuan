@@ -45,6 +45,10 @@ class ExpenseManager extends Component
 
     public function save(): void
     {
+        if (! in_array(auth()->user()?->role, ['owner', 'admin'], true)) {
+            return;
+        }
+
         $validated = $this->validate([
             'expenseDate' => ['required', 'date'],
             'description' => ['required', 'string', 'max:255'],
@@ -68,6 +72,10 @@ class ExpenseManager extends Component
 
     public function edit(int $id): void
     {
+        if (! in_array(auth()->user()?->role, ['owner', 'admin'], true)) {
+            return;
+        }
+
         $this->resetValidation();
         $expense = Expense::query()->findOrFail($id);
 
@@ -81,6 +89,10 @@ class ExpenseManager extends Component
 
     public function delete(int $id): void
     {
+        if (! in_array(auth()->user()?->role, ['owner', 'admin'], true)) {
+            return;
+        }
+
         Expense::query()->findOrFail($id)->delete();
     }
 

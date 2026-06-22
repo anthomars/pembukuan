@@ -53,6 +53,10 @@ class ProductManager extends Component
 
     public function save(): void
     {
+        if (! in_array(auth()->user()?->role, ['owner', 'admin'], true)) {
+            return;
+        }
+
         $validated = $this->validate([
             'barcode' => ['required', 'string', 'max:255', Rule::unique('products', 'barcode')->ignore($this->editingId)],
             'name' => ['required', 'string', 'max:255'],
@@ -81,6 +85,10 @@ class ProductManager extends Component
 
     public function edit(int $id): void
     {
+        if (! in_array(auth()->user()?->role, ['owner', 'admin'], true)) {
+            return;
+        }
+
         $this->resetValidation();
         $product = Product::query()->findOrFail($id);
 

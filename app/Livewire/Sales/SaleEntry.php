@@ -142,6 +142,10 @@ class SaleEntry extends Component
 
     public function incrementItem(int $index): void
     {
+        if (! in_array(auth()->user()?->role, ['owner', 'admin'], true)) {
+            return;
+        }
+
         if (! isset($this->items[$index])) {
             return;
         }
@@ -164,6 +168,10 @@ class SaleEntry extends Component
 
     public function decrementItem(int $index): void
     {
+        if (! in_array(auth()->user()?->role, ['owner', 'admin'], true)) {
+            return;
+        }
+
         if (! isset($this->items[$index])) {
             return;
         }
@@ -180,6 +188,10 @@ class SaleEntry extends Component
 
     public function removeItem(int $index): void
     {
+        if (! in_array(auth()->user()?->role, ['owner', 'admin'], true)) {
+            return;
+        }
+
         if (isset($this->items[$index])) {
             unset($this->items[$index]);
             $this->items = array_values($this->items);

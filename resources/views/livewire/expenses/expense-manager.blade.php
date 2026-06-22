@@ -68,7 +68,9 @@
             <div class="muted">Catat uang keluar harian untuk kebutuhan operasional.</div>
         </div>
         <div class="actions">
-            <button class="button" type="button" wire:click="openCreateModal">+ Tambah Pengeluaran</button>
+            @if (in_array(auth()->user()?->role, ['owner', 'admin'], true))
+                <button class="button" type="button" wire:click="openCreateModal">+ Tambah Pengeluaran</button>
+            @endif
         </div>
     </div>
 
@@ -94,12 +96,14 @@
                             <td>{{ $expense->notes }}</td>
                             <td>
                                 <div class="actions">
+                                    @if (in_array(auth()->user()?->role, ['owner', 'admin'], true))
                                     <button class="button secondary icon" type="button" wire:click="edit({{ $expense->id }})" title="Edit" aria-label="Edit pengeluaran">
                                         ✎
                                     </button>
                                     <button class="button danger icon delete-expense-button" type="button" data-expense-id="{{ $expense->id }}" title="Hapus" aria-label="Hapus pengeluaran">
                                         🗑
                                     </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

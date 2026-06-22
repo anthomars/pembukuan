@@ -219,9 +219,21 @@
                             <td>{{ number_format($itemHppAll, 2, ',', '.') }}</td>
                             <td>{{ number_format($itemMargin, 2, ',', '.') }}</td>
                             <td>{{ number_format($itemMarginPercent, 2, ',', '.') }}%</td>
-                            <td><button type="button" class="button small" wire:click="incrementItem({{ $index }})">+</button></td>
-                            <td><button type="button" class="button small" wire:click="decrementItem({{ $index }})">-</button></td>
-                            <td><button type="button" class="button danger icon delete-item-button" data-item-index="{{ $index }}" title="Hapus">🗑</button></td>
+                            <td>
+                                @if (in_array(auth()->user()?->role, ['owner', 'admin'], true))
+                                    <button type="button" class="button small" wire:click="incrementItem({{ $index }})">+</button>
+                                @endif
+                            </td>
+                            <td>
+                                @if (in_array(auth()->user()?->role, ['owner', 'admin'], true))
+                                    <button type="button" class="button small" wire:click="decrementItem({{ $index }})">-</button>
+                                @endif
+                            </td>
+                            <td>
+                                @if (in_array(auth()->user()?->role, ['owner', 'admin'], true))
+                                    <button type="button" class="button danger icon delete-item-button" data-item-index="{{ $index }}" title="Hapus">🗑</button>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>

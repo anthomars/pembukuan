@@ -68,8 +68,9 @@
             <div class="muted">Kelola barcode, HPP, harga jual, dan stok opsional.</div>
         </div>
         <div class="actions">
-            {{-- <input class="field" style="min-width: 260px;" type="text" wire:model.live="search" placeholder="Cari nama atau barcode"> --}}
-            <button class="button" type="button" wire:click="openCreateModal">+ Tambah Produk</button>
+            @if (in_array(auth()->user()?->role, ['owner', 'admin'], true))
+                <button class="button" type="button" wire:click="openCreateModal">+ Tambah Produk</button>
+            @endif
         </div>
     </div>
 
@@ -101,8 +102,8 @@
                             </td>
                             <td>
                                 <div class="actions">
-                                    <button class="button secondary icon" type="button" wire:click="edit({{ $product->id }})" title="Edit">✎</button>
                                     @if (in_array(auth()->user()?->role, ['owner', 'admin'], true))
+                                        <button class="button secondary icon" type="button" wire:click="edit({{ $product->id }})" title="Edit">✎</button>
                                         <button class="button danger icon delete-product-button" type="button" data-product-id="{{ $product->id }}" title="Hapus">🗑</button>
                                     @endif
                                 </div>
