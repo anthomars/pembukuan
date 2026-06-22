@@ -33,6 +33,7 @@ jobs:
             --exclude='storage/' \
             --exclude='public/storage' \
             --exclude='database/*.sqlite*' \
+            --exclude='caddy/' \
             ./ /opt/rpmcukstore/
 
       - name: Discover packages
