@@ -126,6 +126,93 @@
             font-size: 26px;
             font-weight: 800;
         }
+        .scan-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .scan-row .field-wrap {
+            flex: 1 1 auto;
+        }
+        .scan-camera-button {
+            width: auto;
+            min-width: 54px;
+            padding: 12px 14px;
+            display: none;
+        }
+        .scan-camera-button svg {
+            width: 18px;
+            height: 18px;
+        }
+        .barcode-scanner-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+        }
+        .barcode-scanner-backdrop[hidden] {
+            display: none !important;
+        }
+        .barcode-scanner-modal {
+            width: min(560px, 100%);
+            border-radius: 24px;
+            background: var(--panel);
+            border: 1px solid rgba(217, 226, 242, 0.85);
+            box-shadow: var(--shadow);
+            padding: 18px;
+        }
+        .barcode-scanner-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .barcode-scanner-close {
+            width: auto;
+            min-width: 40px;
+            padding: 8px 10px;
+        }
+        .barcode-scanner-video-wrap {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #0f172a;
+            aspect-ratio: 3 / 4;
+            margin-bottom: 12px;
+        }
+        .barcode-scanner-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .barcode-scanner-target {
+            position: absolute;
+            inset: 14% 12%;
+            border: 2px solid rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.22);
+            pointer-events: none;
+        }
+        .barcode-scanner-status {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: #f8fbff;
+            border: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 14px;
+        }
         form>div {
             margin-bottom: 0;
         }
@@ -145,6 +232,18 @@
                 border-radius: 20px;
             }
         }
+
+        @media (max-width: 768px) {
+            .scan-row {
+                align-items: stretch;
+            }
+            .scan-camera-button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 auto;
+            }
+        }
     </style>
 
     <div class="toolbar">
@@ -160,7 +259,8 @@
 
     <div class="panel" style="box-shadow:none;">
         <form class="stack" wire:submit.prevent="addByBarcode">
-            <div>
+            <div class="scan-row">
+                <div class="field-wrap">
                 <label for="barcode">Scan Barcode</label>
                 <input
                     id="barcode"
@@ -176,6 +276,20 @@
                 @error('barcode')
                     <div class="muted">{{ $message }}</div>
                 @enderror
+                </div>
+
+                <button
+                    type="button"
+                    class="button secondary scan-camera-button"
+                    id="open-barcode-scanner"
+                    aria-label="Scan barcode dengan kamera"
+                    title="Scan barcode dengan kamera"
+                >
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M4 7a2 2 0 0 1 2-2h2l1.2-1.8A2 2 0 0 1 10.86 2h2.28a2 2 0 0 1 1.66 1.2L16 5h2a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9 13.5A3 3 0 1 1 15 13.5a3 3 0 0 1-6 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
             </div>
 
             <div class="muted" style="margin-top:8px;">Scan 1x = qty 1, scan lagi produk yang sama = qty bertambah.</div>
@@ -304,6 +418,30 @@
                             <div class="value" id="adminCalcResult">0</div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div wire:ignore>
+        <div id="barcode-scanner-modal" class="barcode-scanner-backdrop" hidden>
+            <div class="barcode-scanner-modal">
+                <div class="barcode-scanner-head">
+                    <div>
+                        <h3 style="margin:0 0 6px;">Scan Barcode Kamera</h3>
+                        <div class="muted">Arahkan kamera ke barcode produk.</div>
+                    </div>
+                    <button class="button secondary icon barcode-scanner-close" type="button" id="close-barcode-scanner" aria-label="Tutup scanner">x</button>
+                </div>
+
+                <div class="barcode-scanner-video-wrap">
+                    <video id="barcode-scanner-video" class="barcode-scanner-video" playsinline muted></video>
+                    <div class="barcode-scanner-target"></div>
+                </div>
+
+                <div class="barcode-scanner-status">
+                    <span id="barcode-scanner-status-text">Menunggu kamera...</span>
+                    <button class="button secondary" type="button" id="barcode-scanner-toggle-flash" hidden>Flash</button>
                 </div>
             </div>
         </div>
@@ -579,6 +717,195 @@
             window.saleCalculatorBound = true;
         };
 
+        const bindBarcodeScanner = () => {
+            if (window.barcodeScannerBound) {
+                return;
+            }
+
+            const openButton = document.getElementById('open-barcode-scanner');
+            const modal = document.getElementById('barcode-scanner-modal');
+            const closeButton = document.getElementById('close-barcode-scanner');
+            const video = document.getElementById('barcode-scanner-video');
+            const statusText = document.getElementById('barcode-scanner-status-text');
+            const toggleFlashButton = document.getElementById('barcode-scanner-toggle-flash');
+            const barcodeInput = document.getElementById('barcode');
+
+            if (!openButton || !modal || !closeButton || !video || !statusText || !toggleFlashButton || !barcodeInput) {
+                return;
+            }
+
+            const state = {
+                stream: null,
+                detector: null,
+                active: false,
+                rafId: null,
+                lastValue: '',
+                torchEnabled: false,
+                hasTorch: false,
+            };
+
+            const setStatus = (message) => {
+                statusText.textContent = message;
+            };
+
+            const stopScanner = () => {
+                state.active = false;
+
+                if (state.rafId) {
+                    cancelAnimationFrame(state.rafId);
+                    state.rafId = null;
+                }
+
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach((track) => track.stop());
+                    video.srcObject = null;
+                }
+
+                state.stream = null;
+                state.detector = null;
+                modal.hidden = true;
+            };
+
+            const applyTorch = async () => {
+                if (!state.stream || !state.hasTorch) {
+                    return;
+                }
+
+                const track = state.stream.getVideoTracks()[0];
+                const capabilities = track.getCapabilities ? track.getCapabilities() : {};
+
+                if (!capabilities.torch) {
+                    state.hasTorch = false;
+                    toggleFlashButton.hidden = true;
+                    return;
+                }
+
+                state.torchEnabled = !state.torchEnabled;
+                await track.applyConstraints({
+                    advanced: [{ torch: state.torchEnabled }],
+                });
+                toggleFlashButton.textContent = state.torchEnabled ? 'Flash On' : 'Flash';
+            };
+
+            const handleBarcode = async (value) => {
+                if (!value || value === state.lastValue) {
+                    return;
+                }
+
+                state.lastValue = value;
+                barcodeInput.value = value;
+                barcodeInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+                try {
+                    const component = getSaleEntryComponent();
+                    if (component) {
+                        await component.set('barcode', value);
+                        await component.call('addByBarcode');
+                    } else {
+                        barcodeInput.form?.requestSubmit();
+                    }
+                } finally {
+                    stopScanner();
+                }
+            };
+
+            const scanFrame = async () => {
+                if (!state.active || !state.detector) {
+                    return;
+                }
+
+                try {
+                    const barcodes = await state.detector.detect(video);
+                    if (barcodes.length > 0) {
+                        await handleBarcode(barcodes[0].rawValue);
+                        return;
+                    }
+                } catch (error) {
+                    console.warn('Barcode detection failed:', error);
+                }
+
+                state.rafId = requestAnimationFrame(scanFrame);
+            };
+
+            const openScanner = async () => {
+                modal.hidden = false;
+                state.lastValue = '';
+                state.torchEnabled = false;
+                toggleFlashButton.hidden = true;
+                toggleFlashButton.textContent = 'Flash';
+                setStatus('Meminta akses kamera...');
+
+                if (!navigator.mediaDevices?.getUserMedia) {
+                    setStatus('Browser tidak mendukung kamera.');
+                    return;
+                }
+
+                try {
+                    state.stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: { ideal: 'environment' },
+                        },
+                        audio: false,
+                    });
+                } catch (error) {
+                    setStatus('Kamera tidak bisa dibuka. Pastikan izin kamera aktif.');
+                    return;
+                }
+
+                video.srcObject = state.stream;
+
+                try {
+                    await video.play();
+                } catch (error) {
+                    setStatus('Video kamera gagal diputar.');
+                    return;
+                }
+
+                if ('BarcodeDetector' in window) {
+                    try {
+                        state.detector = new BarcodeDetector({
+                            formats: ['ean_13', 'ean_8', 'code_128', 'code_39', 'code_93', 'codabar', 'upc_a', 'upc_e', 'qr_code'],
+                        });
+                        setStatus('Arahkan barcode ke dalam frame.');
+                    } catch (error) {
+                        state.detector = null;
+                        setStatus('Barcode detector tidak tersedia di browser ini.');
+                    }
+                } else {
+                    state.detector = null;
+                    setStatus('Browser ini belum mendukung Barcode Detector.');
+                }
+
+                const track = state.stream.getVideoTracks()[0];
+                const capabilities = track.getCapabilities ? track.getCapabilities() : {};
+                if (capabilities.torch) {
+                    state.hasTorch = true;
+                    toggleFlashButton.hidden = false;
+                }
+
+                state.active = true;
+                scanFrame();
+            };
+
+            openButton.addEventListener('click', openScanner);
+            closeButton.addEventListener('click', stopScanner);
+            toggleFlashButton.addEventListener('click', applyTorch);
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    stopScanner();
+                }
+            });
+
+            window.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && !modal.hidden) {
+                    stopScanner();
+                }
+            });
+
+            window.addEventListener('beforeunload', stopScanner);
+            window.barcodeScannerBound = true;
+        };
+
         const bindSaleEntryLivewire = () => {
             if (window.saleEntryLivewireBound) {
                 return;
@@ -715,6 +1042,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initSaleEntryTable();
             bindSaleCalculator();
+            bindBarcodeScanner();
             bindSaleEntryLivewire();
             bindSaleEntryCustomEvents();
         });
@@ -722,6 +1050,7 @@
         document.addEventListener('livewire:init', () => {
             initSaleEntryTable();
             bindSaleCalculator();
+            bindBarcodeScanner();
             bindSaleEntryLivewire();
             const root = document.querySelector('[wire\\:id]');
             const componentId = root ? root.getAttribute('wire:id') : null;
